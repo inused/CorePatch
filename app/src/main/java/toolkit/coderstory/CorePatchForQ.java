@@ -1,6 +1,7 @@
 package toolkit.coderstory;
 
 
+import android.content.pm.ApplicationInfo;
 import android.content.pm.Signature;
 
 import java.lang.reflect.Constructor;
@@ -108,6 +109,21 @@ public class CorePatchForQ extends XposedHelper implements IXposedHookLoadPackag
                         }
                     }
                 });
+
+        // if app is system app, allow to use hidden api, even if app not using a system signature
+        findAndHookMethod("android.content.pm.ApplicationInfo", loadPackageParam.classLoader, "isPackageWhitelistedForHiddenApis", new XC_MethodHook() {
+            @Override
+            protected void beforeHookedMethod(MethodHookParam param) throws Throwable {
+                super.beforeHookedMethod(param);
+                if (XposedHelper.getConfVal("digestCreak", true)) {
+                    ApplicationInfo info = (ApplicationInfo) param.thisObject;
+                    if ((info.flags & ApplicationInfo.FLAG_SYSTEM) != 0
+                            || (info.flags & ApplicationInfo.FLAG_UPDATED_SYSTEM_APP) != 0) {
+                        param.setResult(true);
+                    }
+                }
+            }
+        });
 
     }
 

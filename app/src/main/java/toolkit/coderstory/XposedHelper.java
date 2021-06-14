@@ -98,6 +98,14 @@ public class XposedHelper {
         }
     }
 
+    public static Class<?> findClass(String className, ClassLoader classLoader) {
+        try {
+            return Class.forName(className, false, classLoader);
+        } catch (Throwable e) {
+            XposedBridge.log(e);
+        }
+        return null;
+    }
     public static void hookAllConstructors(String p1, XC_MethodHook parameterTypesAndCallback) {
         try {
             Class<?> packageParser = findClass(p1, null);
@@ -114,14 +122,6 @@ public class XposedHelper {
             XposedBridge.log(e);
             return null;
         }
-    }
 
-    public static Class<?> findClass(String className, ClassLoader classLoader) {
-        try {
-            return Class.forName(className, false, classLoader);
-        } catch (Throwable e) {
-            XposedBridge.log(e);
-        }
-        return null;
     }
 }
